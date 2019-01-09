@@ -20,14 +20,16 @@ class InteractiveRecord
     column_names.compact
   end
 
-  self.column_names.each do |col_name|
-    attr_accessor col_name.to_sym
-  end
-
   def intialize(options={})
     options.each do |property, value|
       self.send("#{property}=", value)
     end
+  end
+
+  def save
+    sql = "INSERT INTO #{table_name_for_insert} (#{col_names_for_insert}) VALUES (#{values_for_insert})"
+    DB[:conn].execute(sql)
+    @id = DB[:conn].execute("SELECT last_insert_rowid() FROM #{table_name_for_insert}")[0][0]
   end
 
 end
